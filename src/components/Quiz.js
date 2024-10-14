@@ -1,36 +1,45 @@
-import { useReducer } from "react";
+import { useContext } from "react";
 import Question from "./Question";
-
-const intialState = {
-  currentQuestionIndex: 0,
-  questions: [],
-};
-
-const reducer = (state, action) => {
-  if (action.type === "NEXT_QUESTION") {
-    return {
-      ...state,
-      currentQuestionIndex: state.currentQuestionIndex + 1,
-    };
-  }
-  return state;
-};
+import { QuizContext } from "../contexts/quiz";
 
 const Quiz = () => {
-  const [state, dispatch] = useReducer(reducer, intialState);
-
+  const [quizState, dispatch] = useContext(QuizContext);
   return (
     <div className="quiz">
-      <div>
-        <div className="score">Question {state.currentQuestionIndex}/8</div>
-        <Question />
-        <div
-          className="next-button"
-          onClick={() => dispatch({ type: "NEXT_QUESTION" })}
-        >
-          Next Question
+      {quizState.showResults && (
+        <div className="results">
+          <div className="congratulations">Congratulations!</div>
+          <div className="results-info">
+            <div> You have completed the quiz.</div>
+            <div>
+              {" "}
+              You scored {quizState.correctAnswersCount} out of{" "}
+              {quizState.questions.length}.
+            </div>
+          </div>
+          <div
+            className="next-button"
+            onClick={() => dispatch({ type: "RESTART" })}
+          >
+            Restart
+          </div>
         </div>
-      </div>
+      )}
+      {!quizState.showResults && (
+        <div>
+          <div className="score">
+            Question {quizState.currentQuestionIndex + 1}/
+            {quizState.questions.length}
+          </div>
+          <Question />
+          <div
+            className="next-button"
+            onClick={() => dispatch({ type: "NEXT_QUESTION" })}
+          >
+            Next Question
+          </div>
+        </div>
+      )}
     </div>
   );
 };
